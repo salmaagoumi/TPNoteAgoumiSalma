@@ -1,0 +1,114 @@
+CREATE DATABASE tpnote;
+
+CREATE TABLE Realisateur (
+    id_realisateur INT PRIMARY KEY,
+    Nom_realisateur VARCHAR(255) NOT NULL,
+    Prenom_realisateur VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE Film (
+    Identifiant_film INT PRIMARY KEY,
+    titre_du_film VARCHAR(255) NOT NULL,
+    duree_du_film INT NOT NULL, 
+    annee_sortie_film YEAR NOT NULL,
+    id_realisateur INT,
+    FOREIGN KEY (id_realisateur) REFERENCES Realisateur(id_realisateur)
+);
+
+
+CREATE TABLE Acteur (
+    id_acteur INT PRIMARY KEY,
+    Nom_acteur VARCHAR(255) NOT NULL,
+    Prenom_acteur VARCHAR(255) NOT NULL,
+    Role_acteur VARCHAR(255) NOT NULL, 
+    Date_naissance_acteur DATE NOT NULL
+);
+
+
+CREATE TABLE Jouer (
+    Identifiant_film INT,
+    id_acteur INT,
+    PRIMARY KEY (Identifiant_film, id_acteur),
+    FOREIGN KEY (Identifiant_film) REFERENCES Film(Identifiant_film),
+    FOREIGN KEY (id_acteur) REFERENCES Acteur(id_acteur)
+);
+
+
+CREATE TABLE Utilisateur (
+    id_utilisateur INT PRIMARY KEY,
+    Nom_utilisateur VARCHAR(255) NOT NULL,
+    Prenom_utilisateur VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    Mot_de_passe VARCHAR(255) NOT NULL,
+    Role_utilisateur VARCHAR(50) NOT NULL,
+    Films_fav TEXT 
+);
+
+
+CREATE TABLE Favori (
+    Identifiant_film INT,
+    id_utilisateur INT,
+    PRIMARY KEY (Identifiant_film, id_utilisateur),
+    FOREIGN KEY (Identifiant_film) REFERENCES Film(Identifiant_film),
+    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateur(id_utilisateur)
+);
+
+
+1) Les titres et années de sortie des films du plus récent au plus ancien -> 
+SELECT titre_du_film, annee_sortie_film FROM Film ORDER BY annee_sortie_film DESC;
+
+2)La liste des acteurs/actrices principaux pour un film donné ->
+SELECT Acteur.Nom_acteur, Acteur.Prenom_acteur FROM Acteur JOIN Jouer ON Acteur.id_acteur = Jouer.id_acteur WHERE Jouer.Identifiant_film = 1 AND Acteur.Role_acteur = 'principal';
+
+3)La liste des films pour un acteur/actrice donné -> 
+SELECT Film.titre_du_film, Film.annee_sortie_film FROM Film JOIN Jouer ON Film.Identifiant_film = Jouer.Identifiant_film WHERE Jouer.id_acteur = 1;
+
+4) Ajouter un film
+INSERT INTO Film (Identifiant_film, titre_du_film, duree_du_film, annee_sortie_film, id_realisateur) VALUES (5, 'Titanic', 195, 1997, 3);
+
+5) Ajouter un acteur/actrice
+INSERT INTO Acteur (id_acteur, Nom_acteur, Prenom_acteur, Role_acteur, Date_naissance_acteur) VALUES (5, 'DiCaprio', 'Leonardo', 'principal', '1974-11-11');
+
+6) Modifier un film
+UPDATE Film SET titre_du_film = 'L\'Étoile Réparée', duree_du_film = 100, annee_sortie_film = 2011, id_realisateur = 2 WHERE Identifiant_film = 2;
+
+7) Supprimer un acteur/actrice
+DELETE FROM Acteur
+WHERE id_acteur = 1;
+
+
+8) Afficher les 3 derniers acteurs/actrices ajouté(e)s
+SELECT Nom_acteur, Prenom_acteur, Date_naissance_acteur
+FROM Acteur
+ORDER BY id_acteur DESC
+LIMIT 3;
+
+9) Afficher le film le plus ancien
+SELECT titre_du_film, annee_sortie_film
+FROM Film
+ORDER BY annee_sortie_film ASC;
+
+
+
+10) Afficher l’acteur le plus jeune
+SELECT Nom_acteur, Prenom_acteur, Date_naissance_acteur
+FROM Acteur
+ORDER BY Date_naissance_acteur DESC
+LIMIT 1;
+
+
+11) Compter le nombre de films réalisés en 1990
+SELECT COUNT(*)
+FROM Film
+WHERE annee_sortie_film = 1990;
+
+
+12) Faire la somme de tous les acteurs ayant joué dans un film 
+SELECT COUNT(DISTINCT id_acteur)
+FROM Jouer;
+
+
+
+
+
